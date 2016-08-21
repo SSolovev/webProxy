@@ -1,5 +1,8 @@
 package srg.app;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,7 +15,10 @@ import static srg.app.Request.parseRequestFromString;
  * Created by Sergey on 27.07.2016.
  */
 public class TestThread implements Runnable {
-    Socket serverSocketFromBrowser;
+
+    private final static Logger log = LoggerFactory.getLogger(TestThread.class);
+
+    private Socket serverSocketFromBrowser;
 
     public TestThread(Socket serverSocketFromBrowser) {
         this.serverSocketFromBrowser = serverSocketFromBrowser;
@@ -20,103 +26,53 @@ public class TestThread implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Begin!");
+        log.info("Begin!");
         try {
-//            serverSocketFromBrowser = new ServerSocket(5555);
+            try (InputStreamReader fromBrowserStream = new InputStreamReader(serverSocketFromBrowser.getInputStream());
+                 OutputStream toBrowserStream = serverSocketFromBrowser.getOutputStream()) {
 
+                log.info("Accepted!");
+                StringBuilder fromBrowserString = new StringBuilder();
 
-//            while (true) {
-                try (
-//                        Socket browserSocket = serverSocketFromBrowser.accept();
-                        InputStreamReader fromBrowserStream =
-                                new InputStreamReader(serverSocketFromBrowser.getInputStream());
-//                        BufferedReader fromBrowserStream =
-//                                new BufferedReader(
-//                                        new InputStreamReader(browserSocket.getInputStream(),"UTF-8"));
-                        OutputStream toBrowserStream = serverSocketFromBrowser.getOutputStream();
-                ) {
-                    System.out.println("Accepted!");
-//            while (true) {
-                    StringBuilder fromBrowserString = new StringBuilder();
+                char[] buffer = new char[10];
 
-//                sb.delete(0, sb.length());
-//                while (br.ready()) {
-//                    sb.append(br.readLine()).append("\n");
-//                }
-                    String[] hostPort = null;
-                    char[] buffer = new char[10];
-                    while (fromBrowserStream.ready()) {
-                        fromBrowserStream.read(buffer);
-                        fromBrowserString.append(buffer);
+                while (fromBrowserStream.ready()) {
+                    fromBrowserStream.read(buffer);
+                    fromBrowserString.append(buffer);
+                }
 
-                    }
-                    Request request = parseRequestFromString(fromBrowserString.toString());
+                Request request = parseRequestFromString(fromBrowserString.toString());
+
+                if (request != null) {
+                    log.info("+++++Request: \n{}", request);
 //                    System.out.println(request.toString());
-//                    while (fromBrowserStream.ready()) {
-//                       String buff= fromBrowserStream.readLine();
-//                        if(buff!=null && buff.indexOf("Host:")!=-1){
-//                            hostPort=getHostPort(buff);
-//                        }
-//                        fromBrowserString.append(buff);
-//                    }
+                    try (Socket redirectServerSocket = new Socket(request.getHost(), request.getPort());
+                         PrintWriter toRedirectServerStream = new PrintWriter(redirectServerSocket.getOutputStream());
+                         InputStream fromRedirectServerStream = redirectServerSocket.getInputStream();
+                    ) {
+                        toRedirectServerStream.write(fromBrowserString.toString());
+                        toRedirectServerStream.flush();
+                        byte[] b = new byte[4096];
+                        int bytesRead;
 
-                    if (request != null) {
-                        System.out.println("Reading finished!");
-                        System.out.println(request.toString());
-                        try (Socket redirectServerSocket =
-//                                     new Socket(hostPort[0], Integer.parseInt(hostPort[1]));
-                                     new Socket(request.getHost(), request.getPort());
-                             PrintWriter toRedirectServerStream =
-                                     new PrintWriter(redirectServerSocket.getOutputStream());
-//                         OutputStream os = redirectSoket.getOutputStream();
-                             InputStream fromRedirectServerStream = redirectServerSocket.getInputStream();
-                        ) {
-                            toRedirectServerStream.write(fromBrowserString.toString());
-                            toRedirectServerStream.flush();
-                            byte[] b = new byte[4096];
-                            int bytesRead;
-//                        StringCharBuffer cb = new StringCharBuffer();
-//                       ByteArrayInputStream bb =new ByteArrayInputStream();
-                            while ((bytesRead = fromRedirectServerStream.read(b)) != -1) {
-                                System.out.println("Write back to browser!");
-                                System.out.println("=====================");
-                                System.out.println(new String(b));
-                                System.out.println("=====================");
+                        while ((bytesRead = fromRedirectServerStream.read(b)) != -1) {
+                            log.info("****Response part begin***\n{}\n***Response part end***", new String(b));
+                            if (bytesRead > 0) {
                                 toBrowserStream.write(b, 0, bytesRead);
-                                toBrowserStream.flush();
 
                             }
-
-//                            StringBuilder sb = new StringBuilder();
-//                            while ((fromRedirectServerStream.read(b)) != -1) {
-//                                sb.append(b);
-//                                toBrowserStream.write(b);
-//                                toBrowserStream.flush();
-//                            }
-//                            System.out.println("Write back to browser!");
-//                            System.out.println(sb.toString());
-//                            System.out.println("==========================");
-//                            toBrowserStream.write(sb.toString());
-//                            toBrowserStream.flush();
-                            //todo:
-//                            while(fromRedirectServerStream.available()>0)
-//                            System.out.println("Done!");
-
-//                            int bytesRead;
-//                            byte[] reply = new byte[4096];
-//                            while ((bytesRead = isRedirect.read(reply)) != -1) {
-//                                p.write(reply, 0, bytesRead);
-//                                p.flush();
-//                            }
                         }
+                        toBrowserStream.flush();
+
+                    } catch (Exception e) {
+                        log.error("***Error: {}", e);
                     }
-
-
                 }
-//            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            log.error("###Error: {}", e);
         }
     }
 

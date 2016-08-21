@@ -113,17 +113,18 @@ public class Request {
 
     @Override
     public String toString() {
-        return "Request{" +
-                "method=" + method +
-                ", methodValue='" + methodValue + '\'' +
-                ", accept='" + accept + '\'' +
-                ", acceptEncoding='" + acceptEncoding + '\'' +
-                ", range='" + range + '\'' +
-                ", userAgent='" + userAgent + '\'' +
-                ", proxyConnection='" + proxyConnection + '\'' +
-                ", host='" + host + '\'' +
-                ", unnamed='" + unnamed + '\'' +
-                '}';
+        return sourceString;
+//        return "Request{" +
+//                "method=" + method +
+//                ", methodValue='" + methodValue + '\'' +
+//                ", accept='" + accept + '\'' +
+//                ", acceptEncoding='" + acceptEncoding + '\'' +
+//                ", range='" + range + '\'' +
+//                ", userAgent='" + userAgent + '\'' +
+//                ", proxyConnection='" + proxyConnection + '\'' +
+//                ", host='" + host + '\'' +
+//                ", unnamed='" + unnamed + '\'' +
+//                '}';
     }
 }
 

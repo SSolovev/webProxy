@@ -16,11 +16,11 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class App {
     public static void main(String[] args) throws IOException {
-        BlockingQueue<MessageWithResponse> queue = new LinkedBlockingDeque<>();
-        ConsumerThread consumerThread = new ConsumerThread(queue);
-        ListenerThread listenerThread = new ListenerThread(queue);
+//        BlockingQueue<MessageWithResponse> queue = new LinkedBlockingDeque<>();
+//        ConsumerThread consumerThread = new ConsumerThread(queue);
+//        ListenerThread listenerThread = new ListenerThread(queue);
 
-        ExecutorService service = Executors.newFixedThreadPool(2);
+        ExecutorService service = Executors.newFixedThreadPool(1);
 
         ServerSocket serverSocketFromBrowser = new ServerSocket(5555);
         while (true) {
