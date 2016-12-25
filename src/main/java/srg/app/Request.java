@@ -62,6 +62,8 @@ public class Request {
         return unnamed;
     }
 
+
+    //todo: useless
     public static Request parseRequestFromString(String val) {
         if (val != null && !val.isEmpty()) {
             return new Request(val);

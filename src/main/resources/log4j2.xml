@@ -4,15 +4,15 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-        <File name="FileAppender" fileName="D:\\Projects\\proxy\\proxy\\src\\main\\resources\\log" bufferedIO="false">
+        <File name="FileAppender" fileName="/Users/sergey/IdeaProjects/web-proxy/webProxy/log" bufferedIO="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
     </Appenders>
     <Loggers>
-        <Logger name="srg.app.TestThread" level="trace">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="FileAppender"/>
-        </Logger>
+        <!--<Logger name="srg.app.TestThread" level="trace">-->
+            <!--<AppenderRef ref="Console"/>-->
+            <!--<AppenderRef ref="FileAppender"/>-->
+        <!--</Logger>-->
         <Root level="all">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="FileAppender"/>

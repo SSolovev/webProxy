@@ -33,6 +33,16 @@ public class AppTest
      */
     public void testApp()
     {
+
+
+        String chunk="12345\r\n0\r\n\r\n";
+        String chunk2="\r\n0\r\n\r\n";
+        System.out.println(chunk.lastIndexOf("\r\n0\r\n\r\n"));
+        System.out.println(chunk.indexOf("\r\n0\r\n\r\n"));
+        System.out.println(chunk.length());
+        System.out.println(chunk.substring(chunk.length()-7).equals("\r\n0\r\n\r\n"));
+        System.out.println(chunk2.substring(chunk2.length()-7).equals("\r\n0\r\n\r\n"));
+
         assertTrue( true );
     }
 }
